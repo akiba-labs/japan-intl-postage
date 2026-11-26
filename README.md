@@ -2,7 +2,8 @@
 
 Free calculator for **Japan Post's international mail price revision for items posted from 2027-02-01** (国際郵便料金の改定, announced 2026-10-09): current vs revised prices of EMS, international parcels (air, SAL, surface), small packets, International Air Packet, standard letters and postcards for any destination zone and weight, the new 1 kg EMS bands, and the cheapest option.
 
-- Site: https://japan-intl-postage.vercel.app
+- Full app and API (Vercel): https://japan-intl-postage.vercel.app
+- Calculator (GitHub Pages): https://akiba-labs.github.io/japan-intl-postage/
 - API (keyless, CORS open): `GET /api/check?destination=US&weightGrams=500`, `POST /api/check`, `GET /api/rules`
 - Docs: `/openapi.json`, `/llms.txt`, `/.well-known/ai-plugin.json`
 - MCP tool: `japan_international_postage_check` on https://free-agent-tools.vercel.app/mcp
@@ -21,4 +22,9 @@ Sources: [press release](https://www.post.japanpost.jp/newsrelease/pressrelease/
 npm ci
 npm test
 npm run build
+npm run build:pages
 ```
+
+`npm run build` is the Vercel app (calculator, JSON API, share pages). `npm run build:pages` writes a static `out/` for GitHub Pages and checks that internal links and assets resolve under `/japan-intl-postage`. Server routes stay in the repo; the Pages script only moves them aside for that build.
+
+GitHub settings: **Settings → Pages → Build and deployment → Source: GitHub Actions**. Pushes to `main` deploy with `.github/workflows/pages.yml`. The copy-paste steps for the other tool repos are at the top of `scripts/build-pages.mjs`.

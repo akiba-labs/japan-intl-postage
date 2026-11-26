@@ -1,5 +1,7 @@
 import { ImageResponse } from "next/og";
 
+export const dynamic = "force-static";
+
 export const alt = "Japan International Postage 2027: Japan Post EMS, parcel and letter prices now vs from Feb 1, 2027";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";

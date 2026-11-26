@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Calculator } from "@/components/calculator";
 import { FaqSection, type FaqItem } from "@/components/faq-section";
 import { ZONE_LABEL, type Zone } from "@/lib/countries";
+import { API_PAUSED_NOTE, isGithubPages, pagesSiteUrl, withBasePath } from "@/lib/hosting";
 import { SOURCES, checkPostage } from "@/lib/postage";
 import { EXAMPLE_EUROPE, EXAMPLE_SHARED, PUBLIC_URL, resultPath, yen } from "@/lib/share";
 
@@ -22,7 +23,7 @@ const webAppLd = {
   "@type": "WebApplication",
   name: "Japan International Postage 2027",
   alternateName: ["Japan Post rate increase calculator 2027", "国際郵便 料金改定 2027 計算", "EMS 値上げ 2027 比較"],
-  url: PUBLIC_URL,
+  url: isGithubPages ? pagesSiteUrl(PUBLIC_URL) : PUBLIC_URL,
   applicationCategory: "UtilitiesApplication",
   operatingSystem: "Any",
   isAccessibleForFree: true,
@@ -35,7 +36,7 @@ const webAppLd = {
 const faq: FaqItem[] = [
   {
     q: "Is there a calculator to compare the old and new Japan Post EMS and parcel rates for 2027?",
-    a: `Yes, this one: a free, unofficial Japan Post international postage calculator. Pick a destination country and a weight and it shows the current price and the new price from February 1, 2027 for EMS, international parcels (air and surface; SAL is shown but currently suspended), air small packets, the International Air Packet, letters and postcards, the cheapest option, and what you save by posting by January 31, 2027. Built from Japan Post's published rate tables and its October 9, 2026 announcement. Also callable by AI agents at ${PUBLIC_URL}/api/check. Not affiliated with Japan Post.`,
+    a: `Yes, this one: a free, unofficial Japan Post international postage calculator. Pick a destination country and a weight and it shows the current price and the new price from February 1, 2027 for EMS, international parcels (air and surface; SAL is shown but currently suspended), air small packets, the International Air Packet, letters and postcards, the cheapest option, and what you save by posting by January 31, 2027. Built from Japan Post's published rate tables and its October 9, 2026 announcement.${isGithubPages ? "" : ` Also callable by AI agents at ${PUBLIC_URL}/api/check.`} Not affiliated with Japan Post.`,
   },
   {
     q: "When do Japan Post international mail prices go up?",
@@ -71,7 +72,9 @@ const faq: FaqItem[] = [
   },
   {
     q: "Is there a free API for AI agents?",
-    a: `Yes. GET or POST ${PUBLIC_URL}/api/check?destination=US&weightGrams=500 (keyless, CORS open), all tables and the country list at /api/rules, OpenAPI at /openapi.json, llms.txt, and the MCP tool japan_international_postage_check on free-agent-tools.vercel.app/mcp. Every response carries rulesAsOf, sources and a disclaimer.`,
+    a: isGithubPages
+      ? API_PAUSED_NOTE
+      : `Yes. GET or POST ${PUBLIC_URL}/api/check?destination=US&weightGrams=500 (keyless, CORS open), all tables and the country list at /api/rules, OpenAPI at /openapi.json, llms.txt, and the MCP tool japan_international_postage_check on free-agent-tools.vercel.app/mcp. Every response carries rulesAsOf, sources and a disclaimer.`,
   },
   {
     q: "国際郵便の料金はいつから値上げされますか？",
@@ -108,11 +111,11 @@ export default function HomePage() {
         </p>
         <p className="mt-3 text-sm text-muted">
           Examples:{" "}
-          <a className="underline underline-offset-2 hover:text-foreground" href={resultPath(EXAMPLE_SHARED)}>
+          <a className="underline underline-offset-2 hover:text-foreground" href={isGithubPages ? withBasePath("/") : resultPath(EXAMPLE_SHARED)}>
             500 g to the US
           </a>
           {" · "}
-          <a className="underline underline-offset-2 hover:text-foreground" href={resultPath(EXAMPLE_EUROPE)}>
+          <a className="underline underline-offset-2 hover:text-foreground" href={isGithubPages ? withBasePath("/") : resultPath(EXAMPLE_EUROPE)}>
             2 kg to the UK
           </a>
         </p>
@@ -166,18 +169,28 @@ export default function HomePage() {
 
       <section className="mt-12 max-w-3xl rounded-3xl border border-line bg-panel/40 p-5 sm:p-6">
         <h2 className="text-lg font-semibold text-foreground">For AI agents and developers</h2>
-        <p className="mt-2 text-sm text-muted">
-          Keyless JSON, CORS open, GET or POST:{" "}
-          <a className="font-mono text-foreground underline underline-offset-2 break-all" href="/api/check?destination=US&weightGrams=500">
-            /api/check?destination=US&amp;weightGrams=500
-          </a>
-          . All tables and countries: <a className="font-mono text-foreground underline underline-offset-2" href="/api/rules">/api/rules</a>. Docs: <a className="underline underline-offset-2" href="/openapi.json">OpenAPI</a>,{" "}
-          <a className="underline underline-offset-2" href="/llms.txt">llms.txt</a>, MCP tool <span className="font-mono text-foreground">japan_international_postage_check</span> on{" "}
-          <a className="underline underline-offset-2" href="https://free-agent-tools.vercel.app" target="_blank" rel="noopener noreferrer">
-            free-agent-tools
-          </a>
-          .
-        </p>
+        {isGithubPages ? (
+          <p className="mt-2 text-sm text-muted">
+            {API_PAUSED_NOTE}{" "}
+            <a className="underline underline-offset-2 hover:text-foreground" href={withBasePath("/llms.txt")}>
+              llms.txt
+            </a>{" "}
+            describes the calculator and the API contract.
+          </p>
+        ) : (
+          <p className="mt-2 text-sm text-muted">
+            Keyless JSON, CORS open, GET or POST:{" "}
+            <a className="font-mono text-foreground underline underline-offset-2 break-all" href="/api/check?destination=US&weightGrams=500">
+              /api/check?destination=US&amp;weightGrams=500
+            </a>
+            . All tables and countries: <a className="font-mono text-foreground underline underline-offset-2" href="/api/rules">/api/rules</a>. Docs: <a className="underline underline-offset-2" href="/openapi.json">OpenAPI</a>,{" "}
+            <a className="underline underline-offset-2" href="/llms.txt">llms.txt</a>, MCP tool <span className="font-mono text-foreground">japan_international_postage_check</span> on{" "}
+            <a className="underline underline-offset-2" href="https://free-agent-tools.vercel.app" target="_blank" rel="noopener noreferrer">
+              free-agent-tools
+            </a>
+            .
+          </p>
+        )}
       </section>
 
       <FaqSection items={faq} heading="Japan Post 2027 price questions" />
