@@ -4,6 +4,7 @@ import { useState } from "react";
 import { CardDisclaimer } from "@/components/card-disclaimer";
 import { ShareBar } from "@/components/share-bar";
 import { COUNTRIES, ZONE_LABEL, type Zone } from "@/lib/countries";
+import { isGithubPages, pagesSiteUrl } from "@/lib/hosting";
 import { todayJst } from "@/lib/postage";
 import { EXAMPLE_SHARED, PUBLIC_URL, fmtGrams, resultPath, safeCheck, yen, type Shared } from "@/lib/share";
 
@@ -30,7 +31,7 @@ export function Calculator({ initial }: { initial?: Shared }) {
     items: Math.max(1, Math.floor(Number(items) || 1)),
   };
   const r = shared.grams ? safeCheck(shared) : null;
-  const shareUrl = `${PUBLIC_URL}${resultPath(shared)}`;
+  const shareUrl = isGithubPages ? `${pagesSiteUrl(PUBLIC_URL)}/` : `${PUBLIC_URL}${resultPath(shared)}`;
 
   return (
     <div className="grid gap-6 lg:grid-cols-[0.8fr_1.4fr]">
@@ -150,6 +151,9 @@ export function Calculator({ initial }: { initial?: Shared }) {
                 ))}
               </ul>
               <div className="mt-5">
+                {isGithubPages ? (
+                  <p className="mb-3 text-xs text-muted">Share the calculator. A link to this exact result returns when hosting is back.</p>
+                ) : null}
                 <ShareBar url={shareUrl} text={`Japan Post 2027 price rise: ${r.summary} Free calculator:`} />
               </div>
             </>
